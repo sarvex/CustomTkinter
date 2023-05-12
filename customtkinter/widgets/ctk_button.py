@@ -163,11 +163,9 @@ class CTkButton(CTkBaseClass):
 
             self.text_label.configure(text=self.text)  # set text
 
-        else:
-            # delete text_label if no text given
-            if self.text_label is not None:
-                self.text_label.destroy()
-                self.text_label = None
+        elif self.text_label is not None:
+            self.text_label.destroy()
+            self.text_label = None
 
         # create image label if image given
         if self.image is not None:
@@ -189,11 +187,9 @@ class CTkButton(CTkBaseClass):
 
             self.image_label.configure(image=self.image)  # set image
 
-        else:
-            # delete text_label if no text given
-            if self.image_label is not None:
-                self.image_label.destroy()
-                self.image_label = None
+        elif self.image_label is not None:
+            self.image_label.destroy()
+            self.image_label = None
 
         # create grid layout with just an image given
         if self.image_label is not None and self.text_label is None:
@@ -208,28 +204,28 @@ class CTkButton(CTkBaseClass):
 
         # create grid layout of image and text label in 2x2 grid system with given compound
         if self.image_label is not None and self.text_label is not None:
-            if self.compound == tkinter.LEFT or self.compound == "left":
+            if self.compound in [tkinter.LEFT, "left"]:
                 self.image_label.grid(row=0, column=0, sticky="e", rowspan=2, columnspan=1,
                                       padx=(max(self.apply_widget_scaling(self.corner_radius), self.apply_widget_scaling(self.border_width)), 2),
                                       pady=(self.apply_widget_scaling(self.border_width), self.apply_widget_scaling(self.border_width) + 1))
                 self.text_label.grid(row=0, column=1, sticky="w", rowspan=2, columnspan=1,
                                      padx=(2, max(self.apply_widget_scaling(self.corner_radius), self.apply_widget_scaling(self.border_width))),
                                      pady=(self.apply_widget_scaling(self.border_width), self.apply_widget_scaling(self.border_width) + 1))
-            elif self.compound == tkinter.TOP or self.compound == "top":
+            elif self.compound in [tkinter.TOP, "top"]:
                 self.image_label.grid(row=0, column=0, sticky="s", columnspan=2, rowspan=1,
                                       padx=max(self.apply_widget_scaling(self.corner_radius), self.apply_widget_scaling(self.border_width)),
                                       pady=(self.apply_widget_scaling(self.border_width), 2))
                 self.text_label.grid(row=1, column=0, sticky="n", columnspan=2, rowspan=1,
                                      padx=max(self.apply_widget_scaling(self.corner_radius), self.apply_widget_scaling(self.border_width)),
                                      pady=(2, self.apply_widget_scaling(self.border_width)))
-            elif self.compound == tkinter.RIGHT or self.compound == "right":
+            elif self.compound in [tkinter.RIGHT, "right"]:
                 self.image_label.grid(row=0, column=1, sticky="w", rowspan=2, columnspan=1,
                                       padx=(2, max(self.apply_widget_scaling(self.corner_radius), self.apply_widget_scaling(self.border_width))),
                                       pady=(self.apply_widget_scaling(self.border_width), self.apply_widget_scaling(self.border_width) + 1))
                 self.text_label.grid(row=0, column=0, sticky="e", rowspan=2, columnspan=1,
                                      padx=(max(self.apply_widget_scaling(self.corner_radius), self.apply_widget_scaling(self.border_width)), 2),
                                      pady=(self.apply_widget_scaling(self.border_width), self.apply_widget_scaling(self.border_width) + 1))
-            elif self.compound == tkinter.BOTTOM or self.compound == "bottom":
+            elif self.compound in [tkinter.BOTTOM, "bottom"]:
                 self.image_label.grid(row=1, column=0, sticky="n", columnspan=2, rowspan=1,
                                       padx=max(self.apply_widget_scaling(self.corner_radius), self.apply_widget_scaling(self.border_width)),
                                       pady=(2, self.apply_widget_scaling(self.border_width)))
@@ -313,7 +309,7 @@ class CTkButton(CTkBaseClass):
     def set_cursor(self):
         if Settings.cursor_manipulation_enabled:
             if self.state == tkinter.DISABLED:
-                if sys.platform == "darwin" and self.function is not None and Settings.cursor_manipulation_enabled:
+                if sys.platform == "darwin" and self.function is not None:
                     self.configure(cursor="arrow")
                 elif sys.platform.startswith("win") and self.function is not None and Settings.cursor_manipulation_enabled:
                     self.configure(cursor="arrow")
@@ -356,11 +352,7 @@ class CTkButton(CTkBaseClass):
         self.click_animation_running = False
 
         if self.hover is True:
-            if self.fg_color is None:
-                inner_parts_color = self.bg_color
-            else:
-                inner_parts_color = self.fg_color
-
+            inner_parts_color = self.bg_color if self.fg_color is None else self.fg_color
             # set color of inner button parts
             self.canvas.itemconfig("inner_parts",
                                    outline=ThemeManager.single_color(inner_parts_color, self._appearance_mode),
@@ -379,12 +371,10 @@ class CTkButton(CTkBaseClass):
             self.on_enter()
 
     def clicked(self, event=0):
-        if self.function is not None:
-            if self.state is not tkinter.DISABLED:
+        if self.function is not None and self.state is not tkinter.DISABLED:
+            # click animation: change color with .on_leave() and back to normal after 100ms with click_animation()
+            self.on_leave()
+            self.click_animation_running = True
+            self.after(100, self.click_animation)
 
-                # click animation: change color with .on_leave() and back to normal after 100ms with click_animation()
-                self.on_leave()
-                self.click_animation_running = True
-                self.after(100, self.click_animation)
-
-                self.function()
+            self.function()

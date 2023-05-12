@@ -19,7 +19,7 @@ class App(customtkinter.CTk):
         super().__init__(*args, **kwargs)
 
         self.title(App.APP_NAME)
-        self.geometry(str(App.WIDTH) + "x" + str(App.HEIGHT))
+        self.geometry(f"{str(App.WIDTH)}x{str(App.HEIGHT)}")
         self.minsize(App.WIDTH, App.HEIGHT)
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -51,7 +51,6 @@ class App(customtkinter.CTk):
         self.entry_output.delete(0, 'end')
         filename = fd.askdirectory()
         self.entry_output.insert(0,str(filename))
-        pass
 
     def on_closing(self, event=0):
         self.destroy()

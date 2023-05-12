@@ -32,10 +32,7 @@ class ThemeManager:
             tuple color with (light_color, dark_color). The functions then returns
             always a single color string """
 
-        if type(color) == tuple or type(color) == list:
-            return color[appearance_mode]
-        else:
-            return color
+        return color[appearance_mode] if type(color) in [tuple, list] else color
 
     @staticmethod
     def rgb2hex(rgb_color: tuple) -> str:

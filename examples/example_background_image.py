@@ -28,7 +28,9 @@ class App(customtkinter.CTk):
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         # load image with PIL and convert to PhotoImage
-        image = Image.open(PATH + "/test_images/bg_gradient.jpg").resize((self.WIDTH, self.HEIGHT))
+        image = Image.open(f"{PATH}/test_images/bg_gradient.jpg").resize(
+            (self.WIDTH, self.HEIGHT)
+        )
         self.bg_image = ImageTk.PhotoImage(image)
 
         self.image_label = tkinter.Label(master=self, image=self.bg_image)

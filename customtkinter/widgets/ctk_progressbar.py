@@ -24,16 +24,9 @@ class CTkProgressBar(CTkBaseClass):
 
         # set default dimensions according to orientation
         if width is None:
-            if orient.lower() == "vertical":
-                width = 8
-            else:
-                width = 200
+            width = 8 if orient.lower() == "vertical" else 200
         if height is None:
-            if orient.lower() == "vertical":
-                height = 200
-            else:
-                height = 8
-
+            height = 200 if orient.lower() == "vertical" else 8
         # transfer basic functionality (bg_color, size, _appearance_mode, scaling) to CTkBaseClass
         super().__init__(*args, bg_color=bg_color, width=width, height=height, **kwargs)
 
@@ -175,7 +168,7 @@ class CTkProgressBar(CTkBaseClass):
 
         super().configure(*args, **kwargs)
 
-        if require_redraw is True:
+        if require_redraw:
             self.draw()
 
     def variable_callback(self, var_name, index, mode):

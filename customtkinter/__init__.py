@@ -32,13 +32,22 @@ FontManager.load_font(os.path.join(script_directory, "assets", "fonts", "Roboto"
 FontManager.load_font(os.path.join(script_directory, "assets", "fonts", "Roboto", "Roboto-Medium.ttf"))
 
 # load font necessary for rendering the widgets (used on Windows/Linux)
-if FontManager.load_font(os.path.join(script_directory, "assets", "fonts", "CustomTkinter_shapes_font.otf")) is False:
-    # change draw method if font loading failed
-    if DrawEngine.preferred_drawing_method == "font_shapes":
-        sys.stderr.write("customtkinter.__init__ warning: " +
-                         "Preferred drawing method 'font_shapes' can not be used because the font file could not be loaded.\n" +
-                         "Using 'circle_shapes' instead. The rendering quality will be bad!")
-        DrawEngine.preferred_drawing_method = "circle_shapes"
+if (
+    FontManager.load_font(
+        os.path.join(
+            script_directory,
+            "assets",
+            "fonts",
+            "CustomTkinter_shapes_font.otf",
+        )
+    )
+    is False
+    and DrawEngine.preferred_drawing_method == "font_shapes"
+):
+    sys.stderr.write("customtkinter.__init__ warning: " +
+                     "Preferred drawing method 'font_shapes' can not be used because the font file could not be loaded.\n" +
+                     "Using 'circle_shapes' instead. The rendering quality will be bad!")
+    DrawEngine.preferred_drawing_method = "circle_shapes"
 
 # import widgets
 from .widgets.ctk_button import CTkButton

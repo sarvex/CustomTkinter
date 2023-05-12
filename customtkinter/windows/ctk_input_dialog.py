@@ -34,7 +34,7 @@ class CTkInputDialog:
         self.border_color = ThemeManager.theme["color"]["button_hover"] if border_color == "default_theme" else border_color
 
         self.top = CTkToplevel()
-        self.top.geometry(f"{280}x{self.height}")
+        self.top.geometry(f"280x{self.height}")
         self.top.minsize(280, self.height)
         self.top.maxsize(280, self.height)
         self.top.title(title)

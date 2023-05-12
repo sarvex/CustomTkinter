@@ -34,16 +34,9 @@ class CTkSlider(CTkBaseClass):
 
         # set default dimensions according to orientation
         if width is None:
-            if orient.lower() == "vertical":
-                width = 16
-            else:
-                width = 200
+            width = 16 if orient.lower() == "vertical" else 200
         if height is None:
-            if orient.lower() == "vertical":
-                height = 200
-            else:
-                height = 16
-
+            height = 200 if orient.lower() == "vertical" else 16
         # transfer basic functionality (bg_color, size, _appearance_mode, scaling) to CTkBaseClass
         super().__init__(*args, bg_color=bg_color, width=width, height=height, **kwargs)
 
@@ -67,9 +60,7 @@ class CTkSlider(CTkBaseClass):
         self.number_of_steps = number_of_steps
         self.output_value = self.from_ + (self.value * (self.to - self.from_))
 
-        if self.corner_radius < self.button_corner_radius:
-            self.corner_radius = self.button_corner_radius
-
+        self.corner_radius = max(self.corner_radius, self.button_corner_radius)
         # callback and control variables
         self.callback_function = command
         self.variable: tkinter.Variable = variable
@@ -175,11 +166,8 @@ class CTkSlider(CTkBaseClass):
         else:
             self.value = 1 - (event.y / self._current_height) / self._widget_scaling
 
-        if self.value > 1:
-            self.value = 1
-        if self.value < 0:
-            self.value = 0
-
+        self.value = min(self.value, 1)
+        self.value = max(self.value, 0)
         self.output_value = self.round_to_step_size(self.from_ + (self.value * (self.to - self.from_)))
         self.value = (self.output_value - self.from_) / (self.to - self.from_)
 
@@ -207,25 +195,26 @@ class CTkSlider(CTkBaseClass):
         if self.number_of_steps is not None:
             step_size = (self.to - self.from_) / self.number_of_steps
             value = self.to - (round((self.to - value) / step_size) * step_size)
-            return value
-        else:
-            return value
+        return value
 
     def get(self):
         return self.output_value
 
     def set(self, output_value, from_variable_callback=False):
-        if self.from_ < self.to:
-            if output_value > self.to:
-                output_value = self.to
-            elif output_value < self.from_:
-                output_value = self.from_
-        else:
-            if output_value < self.to:
-                output_value = self.to
-            elif output_value > self.from_:
-                output_value = self.from_
-
+        if (
+            self.from_ < self.to
+            and output_value > self.to
+            or self.from_ >= self.to
+            and output_value < self.to
+        ):
+            output_value = self.to
+        elif (
+            self.from_ < self.to
+            and output_value < self.from_
+            or self.from_ >= self.to
+            and output_value > self.from_
+        ):
+            output_value = self.from_
         self.output_value = self.round_to_step_size(output_value)
         self.value = (self.output_value - self.from_) / (self.to - self.from_)
 

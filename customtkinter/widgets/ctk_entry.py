@@ -89,13 +89,16 @@ class CTkEntry(CTkBaseClass):
         self.draw()
 
     def set_placeholder(self, event=None):
-        if self.placeholder_text is not None:
-            if not self.placeholder_text_active and self.entry.get() == "":
-                self.placeholder_text_active = True
-                self.pre_placeholder_arguments = {"show": self.entry.cget("show")}
-                self.entry.config(fg=ThemeManager.single_color(self.placeholder_text_color, self._appearance_mode), show="")
-                self.entry.delete(0, tkinter.END)
-                self.entry.insert(0, self.placeholder_text)
+        if (
+            self.placeholder_text is not None
+            and not self.placeholder_text_active
+            and self.entry.get() == ""
+        ):
+            self.placeholder_text_active = True
+            self.pre_placeholder_arguments = {"show": self.entry.cget("show")}
+            self.entry.config(fg=ThemeManager.single_color(self.placeholder_text_color, self._appearance_mode), show="")
+            self.entry.delete(0, tkinter.END)
+            self.entry.insert(0, self.placeholder_text)
 
     def clear_placeholder(self, event=None):
         if self.placeholder_text_active:
@@ -196,12 +199,9 @@ class CTkEntry(CTkBaseClass):
             self.set_dimensions(height=kwargs["height"])
             del kwargs["height"]
 
-        if "placeholder_text" in kwargs:
-            pass
-
         self.entry.configure(*args, **kwargs)
 
-        if require_redraw is True:
+        if require_redraw:
             self.draw()
 
     def delete(self, *args, **kwargs):
@@ -213,7 +213,4 @@ class CTkEntry(CTkBaseClass):
         return self.entry.insert(*args, **kwargs)
 
     def get(self):
-        if self.placeholder_text_active:
-            return ""
-        else:
-            return self.entry.get()
+        return "" if self.placeholder_text_active else self.entry.get()

@@ -20,14 +20,40 @@ def button_function():
 # load images as PhotoImage
 image_size = 20
 
-settings_image = ImageTk.PhotoImage(Image.open(PATH + "/test_images/settings.png").resize((image_size, image_size)))
-bell_image = ImageTk.PhotoImage(Image.open(PATH + "/test_images/bell.png").resize((image_size, image_size)))
+settings_image = ImageTk.PhotoImage(
+    Image.open(f"{PATH}/test_images/settings.png").resize(
+        (image_size, image_size)
+    )
+)
+bell_image = ImageTk.PhotoImage(
+    Image.open(f"{PATH}/test_images/bell.png").resize((image_size, image_size))
+)
 
-add_folder_image = ImageTk.PhotoImage(Image.open(PATH + "/test_images/add-folder.png").resize((image_size, image_size), Image.ANTIALIAS))
-add_list_image = ImageTk.PhotoImage(Image.open(PATH + "/test_images/add-list.png").resize((image_size, image_size), Image.ANTIALIAS))
-add_user_image = ImageTk.PhotoImage(Image.open(PATH + "/test_images/add-user.png").resize((image_size, image_size), Image.ANTIALIAS))
-chat_image = ImageTk.PhotoImage(Image.open(PATH + "/test_images/chat.png").resize((image_size, image_size), Image.ANTIALIAS))
-home_image = ImageTk.PhotoImage(Image.open(PATH + "/test_images/home.png").resize((image_size, image_size), Image.ANTIALIAS))
+add_folder_image = ImageTk.PhotoImage(
+    Image.open(f"{PATH}/test_images/add-folder.png").resize(
+        (image_size, image_size), Image.ANTIALIAS
+    )
+)
+add_list_image = ImageTk.PhotoImage(
+    Image.open(f"{PATH}/test_images/add-list.png").resize(
+        (image_size, image_size), Image.ANTIALIAS
+    )
+)
+add_user_image = ImageTk.PhotoImage(
+    Image.open(f"{PATH}/test_images/add-user.png").resize(
+        (image_size, image_size), Image.ANTIALIAS
+    )
+)
+chat_image = ImageTk.PhotoImage(
+    Image.open(f"{PATH}/test_images/chat.png").resize(
+        (image_size, image_size), Image.ANTIALIAS
+    )
+)
+home_image = ImageTk.PhotoImage(
+    Image.open(f"{PATH}/test_images/home.png").resize(
+        (image_size, image_size), Image.ANTIALIAS
+    )
+)
 
 app.grid_rowconfigure(0, weight=1)
 app.grid_columnconfigure(0, weight=1, minsize=200)

@@ -102,12 +102,16 @@ class CTkBaseClass(tkinter.Frame):
             if isinstance(scaled_kwargs["pady"], (int, float, str)):
                 scaled_kwargs["pady"] = self.apply_spacing_scaling(scaled_kwargs["pady"])
             elif isinstance(scaled_kwargs["pady"], tuple):
-                scaled_kwargs["pady"] = tuple([self.apply_spacing_scaling(v) for v in scaled_kwargs["pady"]])
+                scaled_kwargs["pady"] = tuple(
+                    self.apply_spacing_scaling(v) for v in scaled_kwargs["pady"]
+                )
         if "padx" in kwargs:
             if isinstance(scaled_kwargs["padx"], (int, float, str)):
                 scaled_kwargs["padx"] = self.apply_spacing_scaling(scaled_kwargs["padx"])
             elif isinstance(scaled_kwargs["padx"], tuple):
-                scaled_kwargs["padx"] = tuple([self.apply_spacing_scaling(v) for v in scaled_kwargs["padx"]])
+                scaled_kwargs["padx"] = tuple(
+                    self.apply_spacing_scaling(v) for v in scaled_kwargs["padx"]
+                )
 
         if "x" in scaled_kwargs:
             scaled_kwargs["x"] = self.apply_spacing_scaling(scaled_kwargs["x"])
@@ -217,10 +221,10 @@ class CTkBaseClass(tkinter.Frame):
             return value
 
     def apply_font_scaling(self, font):
-        if type(font) == tuple or type(font) == list:
+        if type(font) in [tuple, list]:
             font_list = list(font)
             for i in range(len(font_list)):
-                if (type(font_list[i]) == int or type(font_list[i]) == float) and font_list[i] < 0:
+                if type(font_list[i]) in [int, float] and font_list[i] < 0:
                     font_list[i] = int(font_list[i] * self._widget_scaling)
             return tuple(font_list)
 

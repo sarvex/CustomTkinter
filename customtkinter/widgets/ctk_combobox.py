@@ -65,16 +65,8 @@ class CTkComboBox(CTkBaseClass):
         self.hover = hover
         self.click_animation_running = False
 
-        if values is None:
-            self.values = ["CTkComboBox"]
-        else:
-            self.values = values
-
-        if len(self.values) > 0:
-            self.current_value = self.values[0]
-        else:
-            self.current_value = "CTkComboBox"
-
+        self.values = ["CTkComboBox"] if values is None else values
+        self.current_value = self.values[0] if len(self.values) > 0 else "CTkComboBox"
         self.dropdown_menu: Union[DropdownMenu, None] = None
 
         # configure grid system (1x1)
@@ -248,7 +240,7 @@ class CTkComboBox(CTkBaseClass):
 
     def on_enter(self, event=0):
         if self.hover is True and self.state == tkinter.NORMAL and len(self.values) > 0:
-            if sys.platform == "darwin" and len(self.values) > 0 and Settings.cursor_manipulation_enabled:
+            if sys.platform == "darwin" and Settings.cursor_manipulation_enabled:
                 self.canvas.configure(cursor="pointinghand")
             elif sys.platform.startswith("win") and len(self.values) > 0 and Settings.cursor_manipulation_enabled:
                 self.canvas.configure(cursor="hand2")
@@ -288,9 +280,8 @@ class CTkComboBox(CTkBaseClass):
         self.entry.delete(0, tkinter.END)
         self.entry.insert(0, self.current_value)
 
-        if not from_variable_callback:
-            if self.function is not None:
-                self.function(self.current_value)
+        if not from_variable_callback and self.function is not None:
+            self.function(self.current_value)
 
     def get(self) -> str:
         return self.entry.get()

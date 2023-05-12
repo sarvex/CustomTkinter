@@ -8,7 +8,7 @@ customtkinter.set_default_color_theme("green")  # Themes: "blue" (standard), "gr
 class TestApp(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        self.geometry(f"{1400}x{700}")
+        self.geometry('1400x700')
         self.title("CustomTkinter complete test")
 
         self.create_widgets_on_tk()

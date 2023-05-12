@@ -55,10 +55,7 @@ class AppearanceModeTracker:
     @staticmethod
     def detect_appearance_mode() -> int:
         try:
-            if darkdetect.theme() == "Dark":
-                return 1  # Dark
-            else:
-                return 0  # Light
+            return 1 if darkdetect.theme() == "Dark" else 0
         except NameError:
             return 0  # Light
 
@@ -66,22 +63,21 @@ class AppearanceModeTracker:
     def get_tk_root_of_widget(cls, widget):
         current_widget = widget
 
-        while isinstance(current_widget, tkinter.Tk) is False:
+        while not isinstance(current_widget, tkinter.Tk):
             current_widget = current_widget.master
 
         return current_widget
 
     @classmethod
     def update_callbacks(cls):
-        if cls.appearance_mode == 0:
-            for callback in cls.callback_list:
+        for callback in cls.callback_list:
+            if cls.appearance_mode == 0:
                 try:
                     callback("Light")
                 except Exception:
                     continue
 
-        elif cls.appearance_mode == 1:
-            for callback in cls.callback_list:
+            elif cls.appearance_mode == 1:
                 try:
                     callback("Dark")
                 except Exception:

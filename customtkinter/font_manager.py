@@ -8,19 +8,15 @@ class FontManager:
 
     @classmethod
     def init_font_manager(cls):
-        # Linux
-        if sys.platform.startswith("linux"):
-            try:
-                if not os.path.isdir(os.path.expanduser('~/.fonts/')):
-                    os.mkdir(os.path.expanduser('~/.fonts/'))
-                return True
-            except Exception as err:
-                sys.stderr.write("FontManager error: " + str(err) + "\n")
-                return False
-
-        # other platforms
-        else:
+        if not sys.platform.startswith("linux"):
             return True
+        try:
+            if not os.path.isdir(os.path.expanduser('~/.fonts/')):
+                os.mkdir(os.path.expanduser('~/.fonts/'))
+            return True
+        except Exception as err:
+            sys.stderr.write(f"FontManager error: {str(err)}" + "\n")
+            return False
 
     @classmethod
     def windows_load_font(cls, font_path: Union[str, bytes], private: bool = True, enumerable: bool = False) -> bool:
@@ -50,15 +46,13 @@ class FontManager:
         if sys.platform.startswith("win"):
             return cls.windows_load_font(font_path, private=True, enumerable=False)
 
-        # Linux
         elif sys.platform.startswith("linux"):
             try:
                 shutil.copy(font_path, os.path.expanduser("~/.fonts/"))
                 return True
             except Exception as err:
-                sys.stderr.write("FontManager error: " + str(err) + "\n")
+                sys.stderr.write(f"FontManager error: {str(err)}" + "\n")
                 return False
 
-        # macOS and others
         else:
             return False

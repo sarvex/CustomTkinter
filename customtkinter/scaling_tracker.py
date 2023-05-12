@@ -50,8 +50,9 @@ class ScalingTracker:
     def get_window_root_of_widget(cls, widget):
         current_widget = widget
 
-        while isinstance(current_widget, tkinter.Tk) is False and\
-                isinstance(current_widget, tkinter.Toplevel) is False:
+        while not isinstance(current_widget, tkinter.Tk) and not isinstance(
+            current_widget, tkinter.Toplevel
+        ):
             current_widget = current_widget.master
 
         return current_widget
@@ -135,30 +136,26 @@ class ScalingTracker:
                 from ctypes import windll
                 windll.shcore.SetProcessDpiAwareness(2)
                 # Microsoft Docs: https://docs.microsoft.com/en-us/windows/win32/api/shellscalingapi/ne-shellscalingapi-process_dpi_awareness
-            else:
-                pass  # DPI awareness on Linux not implemented
 
     @classmethod
     def get_window_dpi_scaling(cls, window) -> float:
-        if not cls.deactivate_automatic_dpi_awareness:
-            if sys.platform == "darwin":
-                return 1  # scaling works automatically on macOS
-
-            elif sys.platform.startswith("win"):
-                from ctypes import windll, pointer, wintypes
-
-                DPI100pc = 96  # DPI 96 is 100% scaling
-                DPI_type = 0  # MDT_EFFECTIVE_DPI = 0, MDT_ANGULAR_DPI = 1, MDT_RAW_DPI = 2
-                window_hwnd = wintypes.HWND(window.winfo_id())
-                monitor_handle = windll.user32.MonitorFromWindow(window_hwnd, wintypes.DWORD(2))  # MONITOR_DEFAULTTONEAREST = 2
-                x_dpi, y_dpi = wintypes.UINT(), wintypes.UINT()
-                windll.shcore.GetDpiForMonitor(monitor_handle, DPI_type, pointer(x_dpi), pointer(y_dpi))
-                return (x_dpi.value + y_dpi.value) / (2 * DPI100pc)
-
-            else:
-                return 1  # DPI awareness on Linux not implemented
-        else:
+        if cls.deactivate_automatic_dpi_awareness:
             return 1
+        if (
+            sys.platform == "darwin"
+            or sys.platform != "darwin"
+            and not sys.platform.startswith("win")
+        ):
+            return 1  # scaling works automatically on macOS
+
+        from ctypes import windll, pointer, wintypes
+
+        DPI_type = 0  # MDT_EFFECTIVE_DPI = 0, MDT_ANGULAR_DPI = 1, MDT_RAW_DPI = 2
+        window_hwnd = wintypes.HWND(window.winfo_id())
+        monitor_handle = windll.user32.MonitorFromWindow(window_hwnd, wintypes.DWORD(2))  # MONITOR_DEFAULTTONEAREST = 2
+        x_dpi, y_dpi = wintypes.UINT(), wintypes.UINT()
+        windll.shcore.GetDpiForMonitor(monitor_handle, DPI_type, pointer(x_dpi), pointer(y_dpi))
+        return (x_dpi.value + y_dpi.value) / (2 * 96)
 
     @classmethod
     def check_dpi_scaling(cls):

@@ -242,26 +242,27 @@ class CTkCheckBox(CTkBaseClass):
             self.draw()
 
     def set_cursor(self):
-        if Settings.cursor_manipulation_enabled:
-            if self.state == tkinter.DISABLED:
-                if sys.platform == "darwin" and Settings.cursor_manipulation_enabled:
-                    self.canvas.configure(cursor="arrow")
-                    if self.text_label is not None:
-                        self.text_label.configure(cursor="arrow")
-                elif sys.platform.startswith("win") and Settings.cursor_manipulation_enabled:
-                    self.canvas.configure(cursor="arrow")
-                    if self.text_label is not None:
-                        self.text_label.configure(cursor="arrow")
+        if not Settings.cursor_manipulation_enabled:
+            return
+        if self.state == tkinter.DISABLED:
+            if sys.platform == "darwin":
+                self.canvas.configure(cursor="arrow")
+                if self.text_label is not None:
+                    self.text_label.configure(cursor="arrow")
+            elif sys.platform.startswith("win") and Settings.cursor_manipulation_enabled:
+                self.canvas.configure(cursor="arrow")
+                if self.text_label is not None:
+                    self.text_label.configure(cursor="arrow")
 
-            elif self.state == tkinter.NORMAL:
-                if sys.platform == "darwin" and Settings.cursor_manipulation_enabled:
-                    self.canvas.configure(cursor="pointinghand")
-                    if self.text_label is not None:
-                        self.text_label.configure(cursor="pointinghand")
-                elif sys.platform.startswith("win") and Settings.cursor_manipulation_enabled:
-                    self.canvas.configure(cursor="hand2")
-                    if self.text_label is not None:
-                        self.text_label.configure(cursor="hand2")
+        elif self.state == tkinter.NORMAL:
+            if sys.platform == "darwin" and Settings.cursor_manipulation_enabled:
+                self.canvas.configure(cursor="pointinghand")
+                if self.text_label is not None:
+                    self.text_label.configure(cursor="pointinghand")
+            elif sys.platform.startswith("win") and Settings.cursor_manipulation_enabled:
+                self.canvas.configure(cursor="hand2")
+                if self.text_label is not None:
+                    self.text_label.configure(cursor="hand2")
 
     def set_text(self, text):
         self.text = text
@@ -309,21 +310,17 @@ class CTkCheckBox(CTkBaseClass):
                 self.deselect(from_variable_callback=True)
 
     def toggle(self, event=0):
-        if self.state == tkinter.NORMAL:
-            if self.check_state is True:
-                self.check_state = False
-                self.draw()
-            else:
-                self.check_state = True
-                self.draw()
+        if self.state != tkinter.NORMAL:
+            return
+        self.check_state = self.check_state is not True
+        self.draw()
+        if self.function is not None:
+            self.function()
 
-            if self.function is not None:
-                self.function()
-
-            if self.variable is not None:
-                self.variable_callback_blocked = True
-                self.variable.set(self.onvalue if self.check_state is True else self.offvalue)
-                self.variable_callback_blocked = False
+        if self.variable is not None:
+            self.variable_callback_blocked = True
+            self.variable.set(self.onvalue if self.check_state else self.offvalue)
+            self.variable_callback_blocked = False
 
     def select(self, from_variable_callback=False):
         self.check_state = True

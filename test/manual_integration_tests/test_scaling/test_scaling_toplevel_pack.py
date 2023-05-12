@@ -19,7 +19,7 @@ top_tk.geometry("500x500")
 
 
 def button_function():
-    app.geometry(f"{200}x{200}")
+    app.geometry('200x200')
     print("Button click", label_1.text_label.cget("text"))
 
 

@@ -118,15 +118,15 @@ class CTk(tkinter.Tk):
     def minsize(self, width=None, height=None):
         self.min_width = width
         self.min_height = height
-        if self.current_width < width: self.current_width = width
-        if self.current_height < height: self.current_height = height
+        self.current_width = max(self.current_width, width)
+        self.current_height = max(self.current_height, height)
         super().minsize(self.apply_window_scaling(self.min_width), self.apply_window_scaling(self.min_height))
 
     def maxsize(self, width=None, height=None):
         self.max_width = width
         self.max_height = height
-        if self.current_width > width: self.current_width = width
-        if self.current_height > height: self.current_height = height
+        self.current_width = min(self.current_width, width)
+        self.current_height = min(self.current_height, height)
         super().maxsize(self.apply_window_scaling(self.max_width), self.apply_window_scaling(self.max_height))
 
     def geometry(self, geometry_string):
@@ -187,18 +187,26 @@ class CTk(tkinter.Tk):
 
     @staticmethod
     def enable_macos_dark_title_bar():
-        if sys.platform == "darwin" and not Settings.deactivate_macos_window_header_manipulation:  # macOS
-            if Version(platform.python_version()) < Version("3.10"):
-                if Version(tkinter.Tcl().call("info", "patchlevel")) >= Version("8.6.9"):  # Tcl/Tk >= 8.6.9
-                    os.system("defaults write -g NSRequiresAquaSystemAppearance -bool No")
+        if (
+            sys.platform == "darwin"
+            and not Settings.deactivate_macos_window_header_manipulation
+            and Version(platform.python_version()) < Version("3.10")
+            and Version(tkinter.Tcl().call("info", "patchlevel"))
+            >= Version("8.6.9")
+        ):
+            os.system("defaults write -g NSRequiresAquaSystemAppearance -bool No")
                     # This command allows dark-mode for all programs
 
     @staticmethod
     def disable_macos_dark_title_bar():
-        if sys.platform == "darwin" and not Settings.deactivate_macos_window_header_manipulation:  # macOS
-            if Version(platform.python_version()) < Version("3.10"):
-                if Version(tkinter.Tcl().call("info", "patchlevel")) >= Version("8.6.9"):  # Tcl/Tk >= 8.6.9
-                    os.system("defaults delete -g NSRequiresAquaSystemAppearance")
+        if (
+            sys.platform == "darwin"
+            and not Settings.deactivate_macos_window_header_manipulation
+            and Version(platform.python_version()) < Version("3.10")
+            and Version(tkinter.Tcl().call("info", "patchlevel"))
+            >= Version("8.6.9")
+        ):
+            os.system("defaults delete -g NSRequiresAquaSystemAppearance")
                     # This command reverts the dark-mode setting for all programs.
 
     def windows_set_titlebar_color(self, color_mode: str):
@@ -212,39 +220,42 @@ class CTk(tkinter.Tk):
         https://docs.microsoft.com/en-us/windows/win32/api/dwmapi/ne-dwmapi-dwmwindowattribute
         """
 
-        if sys.platform.startswith("win") and not Settings.deactivate_windows_window_header_manipulation:
+        if (
+            not sys.platform.startswith("win")
+            or Settings.deactivate_windows_window_header_manipulation
+        ):
+            return
+        super().withdraw()  # hide window so that it can be redrawn after the titlebar change so that the color change is visible
+        if not self.window_exists:
+            super().update()
 
-            super().withdraw()  # hide window so that it can be redrawn after the titlebar change so that the color change is visible
-            if not self.window_exists:
-                super().update()
+        if color_mode.lower() == "dark":
+            value = 1
+        elif color_mode.lower() == "light":
+            value = 0
+        else:
+            return
 
-            if color_mode.lower() == "dark":
-                value = 1
-            elif color_mode.lower() == "light":
-                value = 0
-            else:
-                return
-
-            try:
-                hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
-                DWMWA_USE_IMMERSIVE_DARK_MODE = 20
-                DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19
-
+        try:
+            hwnd = ctypes.windll.user32.GetParent(self.winfo_id())
+            DWMWA_USE_IMMERSIVE_DARK_MODE = 20
                 # try with DWMWA_USE_IMMERSIVE_DARK_MODE
-                if ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE,
+            if ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE,
                                                               ctypes.byref(ctypes.c_int(value)),
                                                               ctypes.sizeof(ctypes.c_int(value))) != 0:
 
-                    # try with DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20h1
-                    ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1,
-                                                               ctypes.byref(ctypes.c_int(value)),
-                                                               ctypes.sizeof(ctypes.c_int(value)))
+                DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19
 
-            except Exception as err:
-                print(err)
+                # try with DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20h1
+                ctypes.windll.dwmapi.DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1,
+                                                           ctypes.byref(ctypes.c_int(value)),
+                                                           ctypes.sizeof(ctypes.c_int(value)))
 
-            if self.window_exists:
-                self.deiconify()
+        except Exception as err:
+            print(err)
+
+        if self.window_exists:
+            self.deiconify()
 
     def set_appearance_mode(self, mode_string):
         if mode_string.lower() == "dark":

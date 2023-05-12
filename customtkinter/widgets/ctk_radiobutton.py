@@ -229,26 +229,27 @@ class CTkRadioButton(CTkBaseClass):
             self.draw()
 
     def set_cursor(self):
-        if Settings.cursor_manipulation_enabled:
-            if self.state == tkinter.DISABLED:
-                if sys.platform == "darwin" and Settings.cursor_manipulation_enabled:
-                    self.canvas.configure(cursor="arrow")
-                    if self.text_label is not None:
-                        self.text_label.configure(cursor="arrow")
-                elif sys.platform.startswith("win") and Settings.cursor_manipulation_enabled:
-                    self.canvas.configure(cursor="arrow")
-                    if self.text_label is not None:
-                        self.text_label.configure(cursor="arrow")
+        if not Settings.cursor_manipulation_enabled:
+            return
+        if self.state == tkinter.DISABLED:
+            if sys.platform == "darwin":
+                self.canvas.configure(cursor="arrow")
+                if self.text_label is not None:
+                    self.text_label.configure(cursor="arrow")
+            elif sys.platform.startswith("win") and Settings.cursor_manipulation_enabled:
+                self.canvas.configure(cursor="arrow")
+                if self.text_label is not None:
+                    self.text_label.configure(cursor="arrow")
 
-            elif self.state == tkinter.NORMAL:
-                if sys.platform == "darwin" and Settings.cursor_manipulation_enabled:
-                    self.canvas.configure(cursor="pointinghand")
-                    if self.text_label is not None:
-                        self.text_label.configure(cursor="pointinghand")
-                elif sys.platform.startswith("win") and Settings.cursor_manipulation_enabled:
-                    self.canvas.configure(cursor="hand2")
-                    if self.text_label is not None:
-                        self.text_label.configure(cursor="hand2")
+        elif self.state == tkinter.NORMAL:
+            if sys.platform == "darwin" and Settings.cursor_manipulation_enabled:
+                self.canvas.configure(cursor="pointinghand")
+                if self.text_label is not None:
+                    self.text_label.configure(cursor="pointinghand")
+            elif sys.platform.startswith("win") and Settings.cursor_manipulation_enabled:
+                self.canvas.configure(cursor="hand2")
+                if self.text_label is not None:
+                    self.text_label.configure(cursor="hand2")
 
     def set_text(self, text):
         self.text = text
@@ -282,10 +283,9 @@ class CTkRadioButton(CTkBaseClass):
                 self.deselect(from_variable_callback=True)
 
     def invoke(self, event=0):
-        if self.state == tkinter.NORMAL:
-            if self.check_state is False:
-                self.check_state = True
-                self.select()
+        if self.state == tkinter.NORMAL and self.check_state is False:
+            self.check_state = True
+            self.select()
 
         if self.function is not None:
             try:
